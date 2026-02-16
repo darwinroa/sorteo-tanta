@@ -42,16 +42,22 @@ function st_renderizar_formulario() {
                         </span>
                     </span>
                 </label>
+                
                 <input type="text" 
                        name="nro_boleta" 
                        id="nro_boleta"
-                       placeholder="Ej: B001-00045678" 
+                       placeholder="B001-00000000" 
                        required 
-                       maxlength="13" 
-                       oninput="this.value = this.value.toUpperCase()"
-                       pattern="^B\d{3}-\d{8}$"
-                       title="El formato debe ser B seguido de 3 números, un guión y 8 números (Ej: B001-12345678)">
-                <small style="display:block; margin-top:5px; color:#666; font-size:12px;">Formato obligatorio: B001-12345678 (Solo Boletas)</small>
+                       maxlength="13"
+                       autocomplete="off">
+                
+                <small id="st-boleta-help" style="display:block; margin-top:5px; color:#666; font-size:12px;">
+                    Ingresa el número de tu boleta.
+                </small>
+                
+                <small id="st-boleta-error" style="display:none; margin-top:5px; color:#E20E18; font-weight:bold; font-size:12px;">
+                    🚫 Las Facturas (F) no participan. Solo Boletas.
+                </small>
             </div>
 
             <div class="st-form-group">
