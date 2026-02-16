@@ -1,0 +1,264 @@
+.st-form-container { 
+    max-width: 1000px; 
+    width: 100%;
+    margin: 0 auto;
+    font-family: 'Ordina', sans-serif;
+
+    .st-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px 48px;
+    }
+    
+    .st-form-group { 
+        width: calc(50% - 24px);
+
+        @media (width <= 767px) {
+            width: 100%;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 20px;
+            color: #E20E18;
+            margin-bottom: 8px;
+
+            svg {
+                margin-bottom: -3px;
+                margin-left: 10px;
+            }
+        }
+
+        input, select {
+            padding: 12px 14px !important;
+            border-radius: 12px !important;
+            color: #000;
+            font-size: 14px;
+            font-family: 'Ordina', serif;
+            font-weight: normal;
+
+            &::placeholder {
+                color: #71717A;
+            }
+        }
+
+        select {
+            height: 47px;
+        }
+		
+		input[type="date"]{
+		  -webkit-appearance: none;
+		  appearance: none;
+		  box-sizing: border-box;
+		  width: 100%;
+		  min-height: 48px;
+		  padding: 12px 14px;
+		  line-height: 1.2;
+		  font-size: 16px;
+		  background-color: #fff;
+		}
+		input[type="date"]::-webkit-date-and-time-value{
+		  text-align: left;
+		}
+    }
+
+    .st-checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+        font-family: 'Ordina', sans-serif;
+        font-weight: normal;
+        color: #E20E18;
+        font-size: 11px;
+        margin-top: 12px;
+        width: 100%;
+
+        .st-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            input {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    }
+
+    .st-btn { 
+        background: transparent; 
+        color: #E20E18; 
+        padding: 17px 47px; 
+        border: none; 
+        cursor: pointer; 
+        max-width: 348px; 
+        font-size: 18px;
+        text-transform: uppercase;
+        border: solid 1px #E20E18;
+        border-radius: 200px;
+        transition: all 0.3s ease-in-out;
+        margin: auto;
+		margin-top: 56px;
+
+        @media (width <= 767px) {
+            padding: 16px 26px; 
+			margin-top: 26px;
+            width: 100%;
+        }
+
+        svg {
+            margin-left: 16px;
+        }
+
+        &:hover {
+            background-color: #F69F17;
+            border-color: #F69F17;
+        }
+    }
+    
+    .st-form-group input { 
+        width: 100%; 
+        padding: 8px; 
+        border: 1px solid #ccc; 
+        border-radius: 4px; 
+        box-sizing: border-box; 
+    }
+    
+    #st-mensaje { 
+        margin-top: 15px; 
+        font-weight: bold; 
+        text-align: center; 
+        min-height: 24px;
+		width: 100%;
+		
+		@media (width <= 767px) {
+            min-height: 48px;
+        }
+    }
+}
+
+
+/* Estilos para el Tooltip */
+.st-tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* El contenedor de la imagen (oculto por defecto) */
+.st-tooltip-content {
+    visibility: hidden;
+    opacity: 0;
+    width: 250px; /* Ajusta el ancho según tu imagen */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    
+    /* Posicionamiento */
+    position: absolute;
+    bottom: 125%; /* Aparece justo encima del icono */
+    left: 50%;
+    transform: translateX(-50%); /* Centrado */
+    z-index: 100;
+	
+	@media (width <= 767px) {
+		left: 250%;
+	}
+    
+    /* Transición suave */
+    transition: opacity 0.3s;
+}
+
+/* Triángulo decorativo abajo del tooltip */
+.st-tooltip-content::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #fff transparent transparent transparent;
+}
+
+/* Mostrar al pasar el mouse */
+.st-tooltip-wrapper:hover .st-tooltip-content {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Estilo de la imagen dentro del tooltip */
+.st-tooltip-content img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 4px;
+}
+
+/* ... (Tus estilos anteriores del formulario y tooltip) ... */
+
+/* ESTILOS PERSONALIZADOS PARA CHECKBOXES */
+
+/* Contenedor de cada item: Flexbox para alinear caja y texto */
+.st-checkbox-item {
+    display: flex;
+    align-items: flex-start; /* Alinea al inicio para textos largos */
+    gap: 12px; /* Espacio entre el cuadrito y el texto */
+    cursor: pointer;
+}
+
+/* Reseteamos el input original para darle estilo propio */
+.st-checkbox-item input[type="checkbox"] {
+    /* 1. Quitamos estilo por defecto del navegador */
+    -webkit-appearance: none;
+    appearance: none;
+    
+    /* 2. Definimos dimensiones exactas */
+    width: 20px;
+    min-width: 20px; /* Evita que se aplaste si el texto es largo */
+    height: 20px;
+    min-height: 20px;
+    
+    /* 3. Bordes y Colores (Estado: NO MARCADO) */
+    background-color: #fff;
+    border: 2px solid #D4D4D8;
+    border-radius: 4px; /* Un poco redondeado para que se vea moderno */
+    
+    /* 4. Posicionamiento */
+    margin: 0;
+    margin-top: 2px; /* Ajuste fino para alinear con la primera línea de texto */
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Estado: MARCADO (Checked) */
+.st-checkbox-item input[type="checkbox"]:checked {
+    background-color: #E20E18; /* El Rojo de Tanta */
+    border-color: #E20E18;
+}
+
+/* Dibujamos el "Check" (Palomita blanca) usando un pseudo-elemento */
+.st-checkbox-item input[type="checkbox"]:checked::after {
+    content: '';
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0; /* Crea una forma de L */
+    transform: rotate(45deg); /* Rota la L para hacer el check */
+    margin-bottom: 2px; /* Centrado visual */
+}
+
+/* Ajuste del Label para que sea legible y cliqueable */
+.st-checkbox-item label {
+    font-size: 11px;
+    line-height: 1.4;
+    cursor: pointer;
+    font-weight: normal; /* Asegura que no se vea negrita innecesaria */
+}
