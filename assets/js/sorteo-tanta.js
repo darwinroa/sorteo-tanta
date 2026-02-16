@@ -6,7 +6,6 @@ jQuery(document).ready(function($) {
         var $form = $(this);
         var $mensaje = $('#st-mensaje');
         
-        // Limpiar mensaje previo
         $mensaje.html('Procesando...').css('color', '#333');
         
         // 1. Validación de Fecha
@@ -32,8 +31,21 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        // 3. Envío AJAX usando las variables localizadas (SorteoData)
-        // SorteoData.ajax_url y SorteoData.security vienen desde PHP
+        // --- 3. NUEVA VALIDACIÓN DE BOLETA (JS) ---
+        var boleta = $('#nro_boleta').val().toUpperCase();
+        // Regex: Inicia con B, 3 digitos, guion, 8 digitos.
+        var regexBoleta = /^B\d{3}-\d{8}$/;
+
+        if (!regexBoleta.test(boleta)) {
+            if(boleta.startsWith('F')) {
+                $mensaje.html('Las Facturas (F...) no participan. Solo Boletas.').css('color', 'red');
+            } else {
+                $mensaje.html('Formato de boleta inválido. Ejemplo correcto: B001-12345678').css('color', 'red');
+            }
+            return; // Detiene el envío
+        }
+
+        // 4. Envío AJAX
         var formData = $form.serialize();
 
         $.post(SorteoData.ajax_url, formData, function(response) {
