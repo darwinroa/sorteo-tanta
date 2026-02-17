@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Sorteo Tanta
  * Description: Sistema de sorteo con validación de boletas mediante carga de CSV masivo.
- * Version: 1.0.2
+ * Version: 1.1.0
  * Author: Darwin Roa
  */
 
