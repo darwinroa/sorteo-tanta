@@ -5,6 +5,62 @@ add_action('admin_menu', function() {
     add_menu_page('Sorteo Tanta', 'Sorteo Tanta', 'manage_options', 'st-gestion', 'st_renderizar_admin', 'dashicons-tickets', 6);
 });
 
+// =========================================================================
+// NUEVO CÓDIGO AGREGADO: FUNCIÓN DE AYUDA PARA NORMALIZAR FORMATOS
+// =========================================================================
+function st_normalizar_boleta_legacy($boleta_sucia) {
+    $limpia = strtoupper(trim($boleta_sucia));
+    
+    // 1. Detección de Factura (Para preservarla y NO convertirla en B)
+    $es_factura = (strpos($limpia, 'F') === 0);
+
+    // 2. Corregir errores comunes (Letra "O" mayúscula en lugar del Número Cero "0")
+    $limpia = str_replace('O', '0', $limpia);
+
+    // 3. Si ya está en el formato perfecto (Ya sea B o F), la dejamos pasar intacta
+    if (preg_match('/^[BF]\d{3}-\d{8}$/', $limpia)) {
+        return $limpia;
+    }
+
+    // 4. Extraemos solo los números y guiones para trabajar la estructura
+    $solo_num_y_guion = preg_replace('/[^0-9-]/', '', $limpia);
+
+    // Seguridad: Si alguien escribió texto puro sin números (ej. "prueba"), la dejamos intacta.
+    if (empty(preg_replace('/[^0-9]/', '', $solo_num_y_guion))) {
+        return $boleta_sucia;
+    }
+
+    $serie = 0;
+    $numero = 0;
+
+    // 5. Separamos la Serie del Correlativo
+    if (strpos($solo_num_y_guion, '-') !== false) {
+        // Si puso guion (ej: 066-00982613)
+        $partes = explode('-', $solo_num_y_guion);
+        $serie = (int) $partes[0];
+        $numero = (int) $partes[1];
+    } else {
+        // Si no puso guion (ej: 06900473645)
+        $solo_numeros = preg_replace('/[^0-9]/', '', $solo_num_y_guion);
+        if (strlen($solo_numeros) >= 4) {
+            $serie = (int) substr($solo_numeros, 0, 3);
+            $numero = (int) substr($solo_numeros, 3);
+        } else {
+            $numero = (int) $solo_numeros;
+        }
+    }
+
+    // 6. Rellenamos con ceros para cumplir el formato exacto (Serie de 3, Correlativo de 8)
+    $serie_formateada = str_pad($serie, 3, '0', STR_PAD_LEFT);
+    $numero_formateado = str_pad($numero, 8, '0', STR_PAD_LEFT);
+
+    // 7. Retornamos con la letra original correspondiente (F o B)
+    $letra_inicial = $es_factura ? 'F' : 'B';
+
+    return $letra_inicial . $serie_formateada . "-" . $numero_formateado;
+}
+// =========================================================================
+
 function st_renderizar_admin() {
     global $wpdb;
     $tabla = $wpdb->prefix . 'sorteo_boletas';
@@ -61,6 +117,15 @@ function st_renderizar_admin() {
             </div>
         </div>
 
+        <div class="card" style="margin-top:20px; padding:20px; border:1px solid #00a0d2;">
+            <h2 style="color:#00a0d2;"><span class="dashicons dashicons-admin-tools"></span> 3. Mantenimiento: Normalizar Boletas Antiguas</h2>
+            <p>Si tienes usuarios que se registraron antes de aplicar las reglas estrictas (ej: escribieron "1-1234" en vez de "B001-00001234"), esta herramienta recorrerá la base de datos y formateará todos los registros al estándar correcto.</p>
+            <form method="post" onsubmit="return confirm('¿Deseas corregir el formato de todos los registros antiguos en la base de datos?');">
+                <input type="hidden" name="st_accion_admin" value="normalizar_bd">
+                <?php wp_nonce_field('st_admin_nonce'); ?>
+                <button type="submit" class="button button-primary" style="background:#00a0d2; border-color:#0073aa;">Formatear y Corregir Registros Antiguos</button>
+            </form>
+        </div>
         <div class="card" style="margin-top:30px; padding:20px; border:1px solid #dc3232;">
             <h2 style="color:#dc3232;">⚠ Zona de Peligro: Reiniciar Sorteo</h2>
             <p>Esta acción <strong>eliminará permanentemente</strong> todos los registros de la base de datos.</p>
@@ -178,6 +243,46 @@ function st_procesar_acciones_admin() {
         fclose($output);
         exit;
     }
+
+    // =========================================================================
+    // NUEVO CÓDIGO AGREGADO: ACCIÓN PARA NORMALIZAR BASE DE DATOS
+    // =========================================================================
+    if($_POST['st_accion_admin'] == 'normalizar_bd') {
+        check_admin_referer('st_admin_nonce');
+        
+        $todos_los_registros = $wpdb->get_results("SELECT id, nro_boleta FROM $tabla");
+        
+        $actualizados = 0;
+        $errores_duplicados = 0;
+
+        foreach($todos_los_registros as $row) {
+            $boleta_original = $row->nro_boleta;
+            $boleta_corregida = st_normalizar_boleta_legacy($boleta_original);
+
+            if($boleta_original !== $boleta_corregida) {
+                $resultado = $wpdb->update(
+                    $tabla, 
+                    ['nro_boleta' => $boleta_corregida], 
+                    ['id' => $row->id]                   
+                );
+
+                if($resultado !== false) {
+                    $actualizados++;
+                } else {
+                    $errores_duplicados++;
+                }
+            }
+        }
+
+        add_action('admin_notices', function() use ($actualizados, $errores_duplicados) {
+            echo '<div class="notice notice-success is-dismissible"><p><strong>Mantenimiento Finalizado:</strong> Se han corregido y estandarizado <strong>' . $actualizados . '</strong> registros antiguos.</p></div>';
+            
+            if($errores_duplicados > 0) {
+                echo '<div class="notice notice-warning is-dismissible"><p>Nota: Hubo ' . $errores_duplicados . ' registros que no se pudieron actualizar porque, al corregirlos, resultaron ser boletas duplicadas que ya estaban registradas por otra persona.</p></div>';
+            }
+        });
+    }
+    // =========================================================================
 
     // 4. ELIMINAR TODO
     if($_POST['st_accion_admin'] == 'eliminar_todo') {
